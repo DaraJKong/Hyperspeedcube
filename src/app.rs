@@ -666,6 +666,16 @@ impl App {
                 .twist_axis_from_name(name)
                 .ok_or_else(|| format!("Unknown twist axis {name:?}"));
         }
+
+        // TODO: this supposes the puzzle is 4D, replace Rubiks4DDescription with more general thing
+        /*let axes = self.grip().axes;
+        let valid_special_twist = true;
+        for axis in axes {
+            if axes.contains(&Rubiks4DDescription::opposite_twist_axis(axis)) {
+                valid_special_twist = false;
+            }
+        }*/
+
         self.grip().axes.iter().copied().exactly_one().map_err(|e| {
             if e.len() == 0 {
                 "No twist axis gripped".to_string()
