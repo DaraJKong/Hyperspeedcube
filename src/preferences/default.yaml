@@ -764,8 +764,91 @@ puzzle_keybinds:
               twist:
                 direction: z
                 layers: "1"
+      - preset_name: Advanced twists
+        keybinds:
+          - keys:
+              - sc: KeyS
+              - sc: KeyE
+              - sc: KeyI
+              - ~
+            command:
+              twist:
+                axis: I
+                direction: xy2
+                layers: "1"
+          - keys:
+              - sc: KeyS
+              - sc: KeyE
+              - sc: KeyK
+              - ~
+            command:
+              twist:
+                axis: I
+                direction: xy2
+                layers: "1"
+          - keys:
+              - sc: KeyE
+              - sc: KeyF
+              - sc: KeyI
+              - ~
+            command:
+              twist:
+                axis: I
+                direction: zx2
+                layers: "1"
+          - keys:
+              - sc: KeyE
+              - sc: KeyF
+              - sc: KeyK
+              - ~
+            command:
+              twist:
+                axis: I
+                direction: zx2
+                layers: "1"
+          - keys:
+              - sc: KeyF
+              - sc: KeyS
+              - sc: KeyI
+              - ~
+            command:
+              twist:
+                axis: I
+                direction: yz2
+                layers: "1"
+          - keys:
+              - sc: KeyF
+              - sc: KeyS
+              - sc: KeyK
+              - ~
+            command:
+              twist:
+                axis: I
+                direction: yz2
+                layers: "1"
+          - keys:
+              - sc: KeyS
+              - sc: KeyE
+              - sc: KeyF
+              - sc: KeyI
+            command:
+              twist:
+                axis: I
+                direction: xy
+                layers: "1"
+          - keys:
+              - sc: KeyS
+              - sc: KeyE
+              - sc: KeyF
+              - sc: KeyK
+            command:
+              twist:
+                axis: I
+                direction: "y'x'"
+                layers: "1"
       - preset_name: Default
         includes:
+          - Advanced twists
           - ^Basic twists
           - ^Filters
           - ^Layers
@@ -882,6 +965,14 @@ puzzle_keybinds:
               - ~
             command:
               recenter: {}
+          - keys:
+              - sc: ShiftRight
+              - ~
+              - ~
+              - ~
+            command:
+              keybind_set:
+                keybind_set_name: RKT
       - preset_name: RKT
         includes:
           - ^Basic twists
@@ -1106,6 +1197,14 @@ puzzle_keybinds:
                 axis: D
                 direction: y
                 layers: 2..-2
+          - keys:
+              - sc: ShiftRight
+              - ~
+              - ~
+              - ~
+            command:
+              keybind_set:
+                keybind_set_name: Default
       - preset_name: ^Rotations
         keybinds:
           - keys:
