@@ -324,6 +324,14 @@ impl App {
                     ElementState::Pressed => {
                         let mut held = false;
 
+                        // Only ever let a modifier key be in the pressed_keys set is it was the last key pressed
+                        // This prevents modifier keys from counting as one key in the resolve_keys function
+                        self.pressed_keys = self
+                            .pressed_keys
+                            .clone()
+                            .into_iter()
+                            .filter(|k| !k.is_modifier())
+                            .collect();
                         // Record the key as being pressed. If the key is
                         // already pressed, then ignore this event.
                         if let Some(sc) = sc {
@@ -608,6 +616,11 @@ impl App {
 
         let modifiers_mask = self.modifiers_mask(sc, vk);
 
+        let pressed_keys_length = pressed_keys.iter().fold(0, |acc, key| match key {
+            Key::Sc(_) => acc + 1,
+            _ => acc,
+        });
+
         keybinds
             .into_iter()
             .filter(move |bind| {
@@ -624,9 +637,19 @@ impl App {
                         }
                     }
                 });
+                // Prevent long keybinds (2+ keys) from being executed if extra keys are being pressed
+                // This is necessary to prevent conflicts between key combos of different lengths that share almost hte same keys
+                //
+                // For example, the keybinds `S + E + K` and `S + E + F + K` would conflict, and the shorter keybind
+                // would take priority and never let the longer one execute
+                let keys_length = keys
+                    .iter()
+                    .fold(0, |acc, key| if key.is_some() { acc + 1 } else { acc });
+                let extra_keys = pressed_keys_length > keys_length;
+
                 let mods_match =
                     key_combo.mods() & modifiers_mask == self.pressed_modifiers() & modifiers_mask;
-                keys_match && mods_match
+                keys_match && mods_match && !(keys_length >= 2 && extra_keys)
             })
             .collect()
     }
