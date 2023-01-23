@@ -646,7 +646,6 @@ impl App {
                     .iter()
                     .fold(0, |acc, key| if key.is_some() { acc + 1 } else { acc });
                 let extra_keys = pressed_keys_length > keys_length;
-
                 let mods_match =
                     key_combo.mods() & modifiers_mask == self.pressed_modifiers() & modifiers_mask;
                 keys_match && mods_match && !(keys_length >= 2 && extra_keys)

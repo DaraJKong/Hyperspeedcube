@@ -1,6 +1,5 @@
 use egui::NumExt;
 use key_names::KeyMappingCode;
-use std::collections::HashSet;
 
 use super::Window;
 use crate::app::App;
@@ -104,25 +103,48 @@ fn draw_key(ui: &mut egui::Ui, app: &mut App, key: KeyMappingCode, rect: egui::R
     let puzzle_type = app.puzzle.ty();
 
     let vk = key_names::key_to_winit_vkey(key);
+
+    let key_sc = Some(Key::Sc(key));
+    let key_vk = vk.map(Key::Vk);
+
+    // Adds the key to draw in to the pressed_keys
+    // This is to match long keybinds (2+ keys) that are one key away from being complete
+    let mut pressed_keys = app.pressed_keys().clone();
+    pressed_keys = pressed_keys
+        .clone()
+        .into_iter()
+        .filter(|k| !k.is_modifier())
+        .collect();
+    pressed_keys.insert(key_sc.unwrap());
+    if let Some(k) = key_vk {
+        pressed_keys.insert(k);
+    }
+
+    // Add the key (of the keyboard overlay) to the pressed_keys to find keybinds that are one key away from being complete
+    //
+    // The goal is to only show long keybinds in the Keybinds Reference window if all keys except one are pressed
+    // Show the command description on this key if it's the missing one
     let matching_puzzle_keybinds: Vec<&Keybind<PuzzleCommand>> = app
         .resolve_keypress(
             app.prefs.puzzle_keybinds[puzzle_type].get_active_keybinds(),
             Some(key),
             vk,
-            &HashSet::new(),
+            &pressed_keys,
         )
         .into_iter()
-        .take_while(|bind| {
+        .filter(|bind| {
             bind.command != PuzzleCommand::None
-                && bind.key.keys().map(|k| k.is_some()) == [true, false, false, false]
+                && ((bind.key.keys().contains(&key_sc) && key_sc.is_some())
+                    || (bind.key.keys().contains(&key_vk) && key_vk.is_some()))
         })
         .collect();
     let matching_global_keybinds: Vec<&Keybind<Command>> = app
-        .resolve_keypress(&app.prefs.global_keybinds, Some(key), vk, &HashSet::new())
+        .resolve_keypress(&app.prefs.global_keybinds, Some(key), vk, &pressed_keys)
         .into_iter()
-        .take_while(|bind| {
+        .filter(|bind| {
             bind.command != Command::None
-                && bind.key.keys().map(|k| k.is_some()) == [true, false, false, false]
+                && ((bind.key.keys().contains(&key_sc) && key_sc.is_some())
+                    || (bind.key.keys().contains(&key_vk) && key_vk.is_some()))
         })
         .collect();
 
