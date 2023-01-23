@@ -966,7 +966,7 @@ puzzle_keybinds:
             command:
               recenter: {}
           - keys:
-              - sc: ShiftRight
+              - sc: ControlRight
               - ~
               - ~
               - ~
@@ -1198,7 +1198,7 @@ puzzle_keybinds:
                 direction: y
                 layers: 2..-2
           - keys:
-              - sc: ShiftRight
+              - sc: ControlRight
               - ~
               - ~
               - ~
