@@ -29,8 +29,8 @@ fn deser_valid_key_combo<'de, D: Deserializer<'de>>(deserializer: D) -> Result<K
 #[derive(Serialize, Deserialize, Debug, Default, Copy, Clone, PartialEq, Eq)]
 #[serde(default)]
 pub struct KeyCombo {
-    #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    key: Option<Key>,
+    // #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    keys: [Option<Key>; 4],
 
     #[serde(skip_serializing_if = "is_false")]
     ctrl: bool,
@@ -46,35 +46,43 @@ impl fmt::Display for KeyCombo {
         let mods = key_names::mods_prefix_string(self.shift, self.ctrl, self.alt, self.logo);
         write!(f, "{}", mods)?;
 
-        match self.key {
-            Some(Key::Sc(sc)) => write!(f, "{}", key_names::key_name(sc)),
-            // TODO: virtual key code names aren't platform-aware and might not
-            // match scancode names
-            Some(Key::Vk(vk)) => match vk {
-                VirtualKeyCode::Key1 => write!(f, "1"),
-                VirtualKeyCode::Key2 => write!(f, "2"),
-                VirtualKeyCode::Key3 => write!(f, "3"),
-                VirtualKeyCode::Key4 => write!(f, "4"),
-                VirtualKeyCode::Key5 => write!(f, "5"),
-                VirtualKeyCode::Key6 => write!(f, "6"),
-                VirtualKeyCode::Key7 => write!(f, "7"),
-                VirtualKeyCode::Key8 => write!(f, "8"),
-                VirtualKeyCode::Key9 => write!(f, "9"),
-                VirtualKeyCode::Key0 => write!(f, "0"),
-                VirtualKeyCode::Scroll => write!(f, "ScrollLock"),
-                VirtualKeyCode::Back => write!(f, "Backspace"),
-                VirtualKeyCode::Return => write!(f, "Enter"),
-                VirtualKeyCode::Capital => write!(f, "CapsLock"),
-                other => write!(f, "{:?}", other),
-            },
-            None => write!(f, "(no key set)"),
+        let mut display_text = String::new();
+
+        for key in self.keys() {
+            if key.is_some() && display_text.len() > 0 {
+                display_text.push_str(" + ");
+            }
+
+            match key {
+                Some(Key::Sc(sc)) => display_text.push_str(key_names::key_name(sc).as_str()),
+                Some(Key::Vk(vk)) => match vk {
+                    VirtualKeyCode::Key1 => display_text.push_str("1"),
+                    VirtualKeyCode::Key2 => display_text.push_str("2"),
+                    VirtualKeyCode::Key3 => display_text.push_str("3"),
+                    VirtualKeyCode::Key4 => display_text.push_str("4"),
+                    VirtualKeyCode::Key5 => display_text.push_str("5"),
+                    VirtualKeyCode::Key6 => display_text.push_str("6"),
+                    VirtualKeyCode::Key7 => display_text.push_str("7"),
+                    VirtualKeyCode::Key8 => display_text.push_str("8"),
+                    VirtualKeyCode::Key9 => display_text.push_str("9"),
+                    VirtualKeyCode::Key0 => display_text.push_str("0"),
+                    VirtualKeyCode::Scroll => display_text.push_str("ScrollLock"),
+                    VirtualKeyCode::Back => display_text.push_str("Backspace"),
+                    VirtualKeyCode::Return => display_text.push_str("Enter"),
+                    VirtualKeyCode::Capital => display_text.push_str("CapsLock"),
+                    other => display_text.push_str(format!("{:?}", other).as_str()),
+                },
+                None => break,
+            }
         }
+
+        write!(f, "{}", display_text)
     }
 }
 impl KeyCombo {
-    pub fn new(key: Option<Key>, mods: ModifiersState) -> Self {
+    pub fn new(keys: [Option<Key>; 4], mods: ModifiersState) -> Self {
         Self {
-            key,
+            keys,
             ctrl: mods.ctrl(),
             shift: mods.shift(),
             alt: mods.alt(),
@@ -85,18 +93,42 @@ impl KeyCombo {
     #[must_use]
     pub fn validate(self) -> Self {
         Self {
-            key: self.key(),
+            keys: self.keys(),
 
-            // If `key` is equivalent to a modifier key, exclude it from the
+            // If a `key` in keys is equivalent to a modifier key, exclude it from the
             // modifier booleans.
-            ctrl: self.ctrl() && self.key().map_or(true, |k| !k.is_ctrl()),
-            shift: self.shift() && self.key().map_or(true, |k| !k.is_shift()),
-            alt: self.alt() && self.key().map_or(true, |k| !k.is_alt()),
-            logo: self.logo() && self.key().map_or(true, |k| !k.is_logo()),
+            ctrl: self.ctrl()
+                && self.keys().iter().fold(true, |acc, key| {
+                    acc && if let Some(k) = key {
+                        !k.is_ctrl()
+                    } else {
+                        true
+                    }
+                }),
+            shift: self.shift()
+                && self.keys().iter().fold(true, |acc, key| {
+                    acc && if let Some(k) = key {
+                        !k.is_shift()
+                    } else {
+                        true
+                    }
+                }),
+            alt: self.alt()
+                && self.keys().iter().fold(true, |acc, key| {
+                    acc && if let Some(k) = key { !k.is_alt() } else { true }
+                }),
+            logo: self.logo()
+                && self.keys().iter().fold(true, |acc, key| {
+                    acc && if let Some(k) = key {
+                        !k.is_logo()
+                    } else {
+                        true
+                    }
+                }),
         }
     }
-    pub fn key(self) -> Option<Key> {
-        self.key
+    pub fn keys(self) -> [Option<Key>; 4] {
+        self.keys
     }
     pub fn ctrl(self) -> bool {
         self.ctrl
@@ -176,6 +208,9 @@ impl Key {
             Self::Vk(Vk::LWin | Vk::RWin) => true,
             _ => false,
         }
+    }
+    pub fn is_modifier(self) -> bool {
+        self.is_shift() || self.is_ctrl() || self.is_alt() || self.is_logo()
     }
 
     pub fn modifier_bit(self) -> ModifiersState {

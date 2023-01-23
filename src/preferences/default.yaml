@@ -218,54 +218,114 @@ colors:
       U: "#33aaff"
 piece_filters: {}
 global_keybinds:
-  - vk: C
+  - keys:
+      - vk: C
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: copy_hsc_log
-  - vk: C
+  - keys:
+      - vk: C
+      - ~
+      - ~
+      - ~
     ctrl: true
     shift: true
     command: copy_mc4d_log
-  - vk: V
+  - keys:
+      - vk: V
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: paste_log
-  - vk: O
+  - keys:
+      - vk: O
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: open
-  - vk: S
+  - keys:
+      - vk: S
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: save
-  - vk: S
+  - keys:
+      - vk: S
+      - ~
+      - ~
+      - ~
     ctrl: true
     shift: true
     command: save_as
-  - vk: Q
+  - keys:
+      - vk: Q
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: exit
-  - vk: Z
+  - keys:
+      - vk: Z
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: undo
-  - vk: Z
+  - keys:
+      - vk: Z
+      - ~
+      - ~
+      - ~
     ctrl: true
     shift: true
     command: redo
-  - vk: Y
+  - keys:
+      - vk: Y
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: redo
-  - vk: R
+  - keys:
+      - vk: R
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: reset
-  - vk: B
+  - keys:
+      - vk: B
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: toggle_blindfold
-  - vk: F
+  - keys:
+      - vk: F
+      - ~
+      - ~
+      - ~
     ctrl: true
     command: scramble_full
-  - vk: F3
+  - keys:
+      - vk: F3
+      - ~
+      - ~
+      - ~
     command:
       new_puzzle:
         Rubiks3D:
           layer_count: 3
-  - vk: F4
+  - keys:
+      - vk: F4
+      - ~
+      - ~
+      - ~
     command:
       new_puzzle:
         Rubiks4D:
@@ -277,39 +337,75 @@ puzzle_keybinds:
     sets:
       - preset_name: ^Layers
         keybinds:
-          - sc: Digit1
+          - keys:
+              - sc: Digit1
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "1"
-          - sc: Digit2
+          - keys:
+              - sc: Digit2
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "2"
-          - sc: Digit3
+          - keys:
+              - sc: Digit3
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "3"
-          - sc: Digit4
+          - keys:
+              - sc: Digit4
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "4"
-          - sc: Digit5
+          - keys:
+              - sc: Digit5
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "5"
-          - sc: Digit6
+          - keys:
+              - sc: Digit6
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "6"
-          - sc: Digit7
+          - keys:
+              - sc: Digit7
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "7"
-          - sc: Digit8
+          - keys:
+              - sc: Digit8
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "8"
-          - sc: Digit9
+          - keys:
+              - sc: Digit9
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "9"
@@ -317,173 +413,293 @@ puzzle_keybinds:
         includes:
           - ^Layers
         keybinds:
-          - sc: ShiftLeft
+          - keys:
+              - sc: ShiftLeft
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: 1..2
-          - sc: ShiftRight
+          - keys:
+              - sc: ShiftRight
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: 1..2
-          - sc: KeyE
+          - keys:
+              - sc: KeyE
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: CCW
                 layers: "1"
-          - sc: KeyD
+          - keys:
+              - sc: KeyD
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: CW
                 layers: "1"
-          - sc: KeyI
+          - keys:
+              - sc: KeyI
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: CW
                 layers: "1"
-          - sc: KeyK
+          - keys:
+              - sc: KeyK
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: CCW
                 layers: "1"
-          - sc: KeyR
+          - keys:
+              - sc: KeyR
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: CCW
                 layers: 2..-2
-          - sc: KeyV
+          - keys:
+              - sc: KeyV
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: CW
                 layers: 2..-2
-          - sc: KeyU
+          - keys:
+              - sc: KeyU
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: CW
                 layers: 2..-2
-          - sc: KeyM
+          - keys:
+              - sc: KeyM
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: CCW
                 layers: 2..-2
-          - sc: KeyF
+          - keys:
+              - sc: KeyF
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: U
                 direction: CCW
                 layers: "1"
-          - sc: KeyJ
+          - keys:
+              - sc: KeyJ
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: U
                 direction: CW
                 layers: "1"
-          - sc: KeyS
+          - keys:
+              - sc: KeyS
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: D
                 direction: CW
                 layers: "1"
-          - sc: KeyL
+          - keys:
+              - sc: KeyL
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: D
                 direction: CCW
                 layers: "1"
-          - sc: KeyG
+          - keys:
+              - sc: KeyG
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: CCW
                 layers: "1"
-          - sc: KeyH
+          - keys:
+              - sc: KeyH
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: CW
                 layers: "1"
-          - sc: KeyW
+          - keys:
+              - sc: KeyW
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: B
                 direction: CW
                 layers: "1"
-          - sc: KeyO
+          - keys:
+              - sc: KeyO
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: B
                 direction: CCW
                 layers: "1"
-          - sc: KeyT
+          - keys:
+              - sc: KeyT
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: CCW
                 layers: 1..-1
-          - sc: KeyB
+          - keys:
+              - sc: KeyB
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: CW
                 layers: 1..-1
-          - sc: KeyY
+          - keys:
+              - sc: KeyY
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: CW
                 layers: 1..-1
-          - sc: KeyN
+          - keys:
+              - sc: KeyN
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: CCW
                 layers: 1..-1
-          - sc: KeyA
+          - keys:
+              - sc: KeyA
+              - ~
+              - ~
+              - ~
             command:
               recenter:
                 axis: L
-          - sc: Semicolon
+          - keys:
+              - sc: Semicolon
+              - ~
+              - ~
+              - ~
             command:
               recenter:
                 axis: R
-          - sc: KeyQ
+          - keys:
+              - sc: KeyQ
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: CCW
                 layers: 1..-1
-          - sc: KeyP
+          - keys:
+              - sc: KeyP
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: CW
                 layers: 1..-1
-          - sc: KeyZ
+          - keys:
+              - sc: KeyZ
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: CCW
                 layers: 2..-2
-          - sc: Slash
+          - keys:
+              - sc: Slash
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: CW
                 layers: 2..-2
-          - sc: KeyX
+          - keys:
+              - sc: KeyX
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: D
                 direction: CW
                 layers: 2..-2
-          - sc: Period
+          - keys:
+              - sc: Period
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: D
@@ -494,32 +710,56 @@ puzzle_keybinds:
     sets:
       - preset_name: ^Basic twists
         keybinds:
-          - sc: KeyI
+          - keys:
+              - sc: KeyI
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 direction: x
                 layers: "1"
-          - sc: KeyK
+          - keys:
+              - sc: KeyK
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 direction: "x'"
                 layers: "1"
-          - sc: KeyJ
+          - keys:
+              - sc: KeyJ
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 direction: y
                 layers: "1"
-          - sc: KeyL
+          - keys:
+              - sc: KeyL
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 direction: "y'"
                 layers: "1"
-          - sc: KeyU
+          - keys:
+              - sc: KeyU
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 direction: "z'"
                 layers: "1"
-          - sc: KeyO
+          - keys:
+              - sc: KeyO
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 direction: z
@@ -530,60 +770,116 @@ puzzle_keybinds:
           - ^Filters
           - ^Layers
         keybinds:
-          - sc: ShiftLeft
+          - keys:
+              - sc: ShiftLeft
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: 1..2
-          - sc: ShiftRight
+          - keys:
+              - sc: ShiftRight
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: 1..2
-          - sc: AltLeft
+          - keys:
+              - sc: AltLeft
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "2"
-          - sc: AltRight
+          - keys:
+              - sc: AltRight
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "2"
-          - sc: KeyW
+          - keys:
+              - sc: KeyW
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: L
-          - sc: KeyE
+          - keys:
+              - sc: KeyE
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: U
-          - sc: KeyR
+          - keys:
+              - sc: KeyR
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: B
-          - sc: KeyS
+          - keys:
+              - sc: KeyS
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: F
-          - sc: KeyD
+          - keys:
+              - sc: KeyD
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: I
-          - sc: KeyF
+          - keys:
+              - sc: KeyF
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: R
-          - sc: KeyC
+          - keys:
+              - sc: KeyC
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: D
-          - sc: KeyV
+          - keys:
+              - sc: KeyV
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: O
-          - sc: KeyX
+          - keys:
+              - sc: KeyX
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: I
                 layers: 1..-1
-          - sc: Space
+          - keys:
+              - sc: Space
+              - ~
+              - ~
+              - ~
             command:
               recenter: {}
       - preset_name: RKT
@@ -593,130 +889,218 @@ puzzle_keybinds:
           - ^Layers
           - ^Rotations
         keybinds:
-          - sc: ShiftLeft
+          - keys:
+              - sc: ShiftLeft
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: 1..2
-          - sc: Space
+          - keys:
+              - sc: Space
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 axis: I
                 layers: "1"
-          - sc: KeyE
+          - keys:
+              - sc: KeyE
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: x
                 layers: "1"
-          - sc: KeyD
+          - keys:
+              - sc: KeyD
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: "x'"
                 layers: "1"
-          - sc: KeyI
+          - keys:
+              - sc: KeyI
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: x
                 layers: "1"
-          - sc: KeyK
+          - keys:
+              - sc: KeyK
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: "x'"
                 layers: "1"
-          - sc: KeyR
+          - keys:
+              - sc: KeyR
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: x
                 layers: 2..-2
-          - sc: KeyV
+          - keys:
+              - sc: KeyV
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: L
                 direction: "x'"
                 layers: 2..-2
-          - sc: KeyU
+          - keys:
+              - sc: KeyU
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: x
                 layers: 2..-2
-          - sc: KeyM
+          - keys:
+              - sc: KeyM
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: R
                 direction: "x'"
                 layers: 2..-2
-          - sc: KeyF
+          - keys:
+              - sc: KeyF
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: U
                 direction: "y'"
                 layers: "1"
-          - sc: KeyJ
+          - keys:
+              - sc: KeyJ
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: U
                 direction: y
                 layers: "1"
-          - sc: KeyS
+          - keys:
+              - sc: KeyS
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: D
                 direction: "y'"
                 layers: "1"
-          - sc: KeyL
+          - keys:
+              - sc: KeyL
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: D
                 direction: y
                 layers: "1"
-          - sc: KeyG
+          - keys:
+              - sc: KeyG
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: "z'"
                 layers: "1"
-          - sc: KeyH
+          - keys:
+              - sc: KeyH
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: z
                 layers: "1"
-          - sc: KeyW
+          - keys:
+              - sc: KeyW
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: B
                 direction: "z'"
                 layers: "1"
-          - sc: KeyO
+          - keys:
+              - sc: KeyO
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: B
                 direction: z
                 layers: "1"
-          - sc: KeyZ
+          - keys:
+              - sc: KeyZ
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: "z'"
                 layers: 2..-2
-          - sc: Slash
+          - keys:
+              - sc: Slash
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: F
                 direction: z
                 layers: 2..-2
-          - sc: KeyX
+          - keys:
+              - sc: KeyX
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: D
                 direction: "y'"
                 layers: 2..-2
-          - sc: Period
+          - keys:
+              - sc: Period
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: D
@@ -724,49 +1108,81 @@ puzzle_keybinds:
                 layers: 2..-2
       - preset_name: ^Rotations
         keybinds:
-          - sc: KeyT
+          - keys:
+              - sc: KeyT
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: I
                 direction: x
                 layers: 1..-1
-          - sc: KeyY
+          - keys:
+              - sc: KeyY
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: I
                 direction: x
                 layers: 1..-1
-          - sc: KeyB
+          - keys:
+              - sc: KeyB
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: I
                 direction: "x'"
                 layers: 1..-1
-          - sc: KeyN
+          - keys:
+              - sc: KeyN
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: I
                 direction: "x'"
                 layers: 1..-1
-          - sc: KeyA
+          - keys:
+              - sc: KeyA
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: I
                 direction: "y'"
                 layers: 1..-1
-          - sc: Semicolon
+          - keys:
+              - sc: Semicolon
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: I
                 direction: y
                 layers: 1..-1
-          - sc: KeyQ
+          - keys:
+              - sc: KeyQ
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: I
                 direction: "z'"
                 layers: 1..-1
-          - sc: KeyP
+          - keys:
+              - sc: KeyP
+              - ~
+              - ~
+              - ~
             command:
               twist:
                 axis: I
@@ -774,50 +1190,94 @@ puzzle_keybinds:
                 layers: 1..-1
       - preset_name: ^Layers
         keybinds:
-          - sc: Digit1
+          - keys:
+              - sc: Digit1
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "1"
-          - sc: Digit2
+          - keys:
+              - sc: Digit2
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "2"
-          - sc: Digit3
+          - keys:
+              - sc: Digit3
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "3"
-          - sc: Digit4
+          - keys:
+              - sc: Digit4
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "4"
-          - sc: Digit5
+          - keys:
+              - sc: Digit5
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "5"
-          - sc: Digit6
+          - keys:
+              - sc: Digit6
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "6"
-          - sc: Digit7
+          - keys:
+              - sc: Digit7
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "7"
-          - sc: Digit8
+          - keys:
+              - sc: Digit8
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "8"
-          - sc: Digit9
+          - keys:
+              - sc: Digit9
+              - ~
+              - ~
+              - ~
             command:
               grip:
                 layers: "9"
       - preset_name: ^Filters
         keybinds:
-          - sc: Backquote
+          - keys:
+              - sc: Backquote
+              - ~
+              - ~
+              - ~
             command:
               filter:
                 mode: show_exactly
                 filter_name: Everything
-          - sc: Backquote
+          - keys:
+              - sc: Backquote
+              - ~
+              - ~
+              - ~
             shift: true
             command:
               filter:

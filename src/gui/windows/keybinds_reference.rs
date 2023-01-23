@@ -1,5 +1,6 @@
 use egui::NumExt;
 use key_names::KeyMappingCode;
+use std::collections::HashSet;
 
 use super::Window;
 use crate::app::App;
@@ -108,14 +109,21 @@ fn draw_key(ui: &mut egui::Ui, app: &mut App, key: KeyMappingCode, rect: egui::R
             app.prefs.puzzle_keybinds[puzzle_type].get_active_keybinds(),
             Some(key),
             vk,
+            &HashSet::new(),
         )
         .into_iter()
-        .take_while(|bind| bind.command != PuzzleCommand::None)
+        .take_while(|bind| {
+            bind.command != PuzzleCommand::None
+                && bind.key.keys().map(|k| k.is_some()) == [true, false, false, false]
+        })
         .collect();
     let matching_global_keybinds: Vec<&Keybind<Command>> = app
-        .resolve_keypress(&app.prefs.global_keybinds, Some(key), vk)
+        .resolve_keypress(&app.prefs.global_keybinds, Some(key), vk, &HashSet::new())
         .into_iter()
-        .take_while(|bind| bind.command != Command::None)
+        .take_while(|bind| {
+            bind.command != Command::None
+                && bind.key.keys().map(|k| k.is_some()) == [true, false, false, false]
+        })
         .collect();
 
     let s = matching_puzzle_keybinds

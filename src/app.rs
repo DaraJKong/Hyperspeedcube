@@ -391,8 +391,8 @@ impl App {
 
         let active_puzzle_keybinds =
             self.prefs.puzzle_keybinds[self.puzzle.ty()].get_active_keybinds();
-        for bind in self.resolve_keypress(active_puzzle_keybinds, sc, vk) {
-            let key = bind.key.key().unwrap();
+        for bind in self.resolve_keypress(active_puzzle_keybinds, sc, vk, &self.pressed_keys) {
+            let key = bind.key.keys()[0].unwrap();
             match &bind.command {
                 PuzzleCommand::Grip { axis, layers } => {
                     let mut new_grip = Grip::default();
@@ -571,7 +571,7 @@ impl App {
             }
         }
 
-        for bind in self.resolve_keypress(&self.prefs.global_keybinds, sc, vk) {
+        for bind in self.resolve_keypress(&self.prefs.global_keybinds, sc, vk, &self.pressed_keys) {
             match &bind.command {
                 Command::None => return, // Do not try to match other keybinds.
 
@@ -601,6 +601,7 @@ impl App {
         keybinds: impl IntoIterator<Item = &'a Keybind<C>>,
         sc: Option<KeyMappingCode>,
         vk: Option<VirtualKeyCode>,
+        pressed_keys: &HashSet<Key>,
     ) -> Vec<&'a Keybind<C>> {
         let sc = sc.map(Key::Sc);
         let vk = vk.map(Key::Vk);
@@ -611,11 +612,21 @@ impl App {
             .into_iter()
             .filter(move |bind| {
                 let key_combo = bind.key;
-                let key = key_combo.key();
-                let key_matches = (sc.is_some() && sc == key) || (vk.is_some() && vk == key);
+                let keys = key_combo.keys();
+                let keys_match = keys.iter().enumerate().fold(true, |acc, (i, key)| {
+                    acc && if let Some(k) = key {
+                        pressed_keys.contains(k) || Some(*k) == sc || Some(*k) == vk
+                    } else {
+                        if i == 0 {
+                            false
+                        } else {
+                            true
+                        }
+                    }
+                });
                 let mods_match =
                     key_combo.mods() & modifiers_mask == self.pressed_modifiers() & modifiers_mask;
-                key_matches && mods_match
+                keys_match && mods_match
             })
             .collect()
     }
@@ -666,15 +677,6 @@ impl App {
                 .twist_axis_from_name(name)
                 .ok_or_else(|| format!("Unknown twist axis {name:?}"));
         }
-
-        // TODO: this supposes the puzzle is 4D, replace Rubiks4DDescription with more general thing
-        /*let axes = self.grip().axes;
-        let valid_special_twist = true;
-        for axis in axes {
-            if axes.contains(&Rubiks4DDescription::opposite_twist_axis(axis)) {
-                valid_special_twist = false;
-            }
-        }*/
 
         self.grip().axes.iter().copied().exactly_one().map_err(|e| {
             if e.len() == 0 {

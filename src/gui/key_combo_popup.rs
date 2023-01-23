@@ -1,4 +1,5 @@
 use key_names::KeyMappingCode;
+use std::cmp::min;
 use std::sync::Arc;
 use winit::event::{ElementState, ModifiersState, VirtualKeyCode, WindowEvent};
 
@@ -17,31 +18,51 @@ pub(super) struct State {
     /// popup is closed.
     callback: Option<Arc<dyn Send + Sync + Fn(&mut App, KeyCombo)>>,
 
-    key: Option<KeyCombo>,
+    key_combo: Option<KeyCombo>,
 
     mods: ModifiersState,
-    last_vk_pressed: Option<VirtualKeyCode>,
-    last_sc_pressed: Option<KeyMappingCode>,
+    ordered_pressed_keys: Vec<(Option<KeyMappingCode>, Option<VirtualKeyCode>)>,
 
     use_vk: bool,
     use_vk_id: Option<egui::Id>,
 }
 impl State {
     fn update_keybind(&mut self) {
-        let sc = self.last_sc_pressed.map(Key::Sc);
-        let vk = self.last_vk_pressed.map(Key::Vk);
-        let key = if self.use_vk { vk.or(sc) } else { sc.or(vk) };
+        let mut keys = [None, None, None, None];
+        for i in 0..min(keys.len(), self.ordered_pressed_keys.len()) {
+            keys[i] = if self.use_vk {
+                self.ordered_pressed_keys[i]
+                    .1
+                    .map(Key::Vk)
+                    .or(self.ordered_pressed_keys[i].0.map(Key::Sc))
+            } else {
+                self.ordered_pressed_keys[i]
+                    .0
+                    .map(Key::Sc)
+                    .or(self.ordered_pressed_keys[i].1.map(Key::Vk))
+            };
+        }
 
-        self.key = Some(KeyCombo::new(key, self.mods));
+        self.key_combo = Some(KeyCombo::new(keys, self.mods));
     }
     fn set_key(&mut self, sc: KeyMappingCode, vk: VirtualKeyCode) {
-        self.last_sc_pressed = Some(sc);
-        self.last_vk_pressed = Some(vk);
+        self.ordered_pressed_keys = self
+            .ordered_pressed_keys
+            .clone()
+            .into_iter()
+            .filter(|k| {
+                !(k.0.map(Key::Sc).unwrap().is_modifier()
+                    || k.1.map(Key::Vk).unwrap().is_modifier())
+            })
+            .collect();
+        if !self.ordered_pressed_keys.contains(&(Some(sc), Some(vk))) {
+            self.ordered_pressed_keys.push((Some(sc), Some(vk)));
+        }
         self.update_keybind();
     }
     fn confirm(&mut self, app: &mut App) {
         if let Some(callback) = self.callback.take() {
-            callback(app, self.key.unwrap_or_default());
+            callback(app, self.key_combo.unwrap_or_default());
         }
     }
     fn cancel(&mut self) {
@@ -61,7 +82,7 @@ fn popup_state_id() -> egui::Id {
 
 pub(super) fn open<S: KeybindSetAccessor>(
     ctx: &egui::Context,
-    key: Option<KeyCombo>,
+    key_combo: Option<KeyCombo>,
     keybind_set: S,
     idx: usize,
 ) {
@@ -79,11 +100,10 @@ pub(super) fn open<S: KeybindSetAccessor>(
             app.prefs.needs_save = true;
         })),
 
-        key,
+        key_combo,
 
         mods: ModifiersState::empty(),
-        last_vk_pressed: None,
-        last_sc_pressed: None,
+        ordered_pressed_keys: Vec::new(),
 
         use_vk,
         use_vk_id: Some(use_vk_id),
@@ -118,8 +138,8 @@ pub(super) fn build(ctx: &egui::Context, app: &mut App) -> Option<egui::Response
 
                                 ui.heading("Press a key combination");
 
-                                let key_combo = popup_state(ctx).key.unwrap_or_default();
-                                if key_combo.key().is_some() {
+                                let key_combo = popup_state(ctx).key_combo.unwrap_or_default();
+                                if key_combo.keys().map(|k| k.is_some()).contains(&true) {
                                     ui.strong(key_combo.to_string());
                                 } else {
                                     ui.strong("(press a key)");
@@ -227,11 +247,29 @@ pub(crate) fn key_combo_popup_handle_event(
                     Some(VirtualKeyCode::Return) if popup.mods.is_empty() => popup.confirm(app),
                     Some(VirtualKeyCode::Escape) if popup.mods.is_empty() => popup.cancel(),
                     _ => {
-                        popup.last_sc_pressed = key_names::sc_to_key(input.scancode as u16);
-                        popup.last_vk_pressed = input.virtual_keycode;
-                        popup.update_keybind();
+                        let sc = key_names::sc_to_key(input.scancode as u16);
+                        let vk = input.virtual_keycode;
+
+                        if let Some(kmc) = sc {
+                            if let Some(vkc) = vk {
+                                popup.set_key(kmc, vkc);
+                            }
+                        }
                     }
                 }
+            }
+            winit::event::WindowEvent::KeyboardInput { input, .. }
+                if input.state == ElementState::Released =>
+            {
+                let sc = key_names::sc_to_key(input.scancode as u16);
+                let vk = input.virtual_keycode;
+
+                popup.ordered_pressed_keys = popup
+                    .ordered_pressed_keys
+                    .clone()
+                    .into_iter()
+                    .filter(|k| k != &(sc, vk))
+                    .collect();
             }
 
             winit::event::WindowEvent::ModifiersChanged(mods) => popup.mods = *mods,
