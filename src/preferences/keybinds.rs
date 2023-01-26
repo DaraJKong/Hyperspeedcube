@@ -26,11 +26,10 @@ fn deser_valid_key_combo<'de, D: Deserializer<'de>>(deserializer: D) -> Result<K
     KeyCombo::deserialize(deserializer).map(KeyCombo::validate)
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, Copy, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq)]
 #[serde(default)]
 pub struct KeyCombo {
-    // #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    keys: [Option<Key>; 4],
+    pub keys: Vec<Key>,
 
     #[serde(skip_serializing_if = "is_false")]
     ctrl: bool,
@@ -49,13 +48,13 @@ impl fmt::Display for KeyCombo {
         let mut display_text = String::new();
 
         for key in self.keys() {
-            if key.is_some() && display_text.len() > 0 {
+            if display_text.len() > 0 {
                 display_text.push_str(" + ");
             }
 
             match key {
-                Some(Key::Sc(sc)) => display_text.push_str(key_names::key_name(sc).as_str()),
-                Some(Key::Vk(vk)) => match vk {
+                Key::Sc(sc) => display_text.push_str(key_names::key_name(*sc).as_str()),
+                Key::Vk(vk) => match vk {
                     VirtualKeyCode::Key1 => display_text.push_str("1"),
                     VirtualKeyCode::Key2 => display_text.push_str("2"),
                     VirtualKeyCode::Key3 => display_text.push_str("3"),
@@ -72,7 +71,6 @@ impl fmt::Display for KeyCombo {
                     VirtualKeyCode::Capital => display_text.push_str("CapsLock"),
                     other => display_text.push_str(format!("{:?}", other).as_str()),
                 },
-                None => break,
             }
         }
 
@@ -80,7 +78,7 @@ impl fmt::Display for KeyCombo {
     }
 }
 impl KeyCombo {
-    pub fn new(keys: [Option<Key>; 4], mods: ModifiersState) -> Self {
+    pub fn new(keys: Vec<Key>, mods: ModifiersState) -> Self {
         Self {
             keys,
             ctrl: mods.ctrl(),
@@ -92,69 +90,54 @@ impl KeyCombo {
     }
     #[must_use]
     pub fn validate(self) -> Self {
+        let (mut ctrl, mut shift, mut alt, mut logo) = (false, false, false, false);
+
+        for key in self.keys() {
+            ctrl |= key.is_ctrl();
+            shift |= key.is_shift();
+            alt |= key.is_alt();
+            logo |= key.is_logo();
+        }
+
         Self {
-            keys: self.keys(),
+            keys: self.keys.clone(),
 
             // If a `key` in keys is equivalent to a modifier key, exclude it from the
             // modifier booleans.
-            ctrl: self.ctrl()
-                && self.keys().iter().fold(true, |acc, key| {
-                    acc && if let Some(k) = key {
-                        !k.is_ctrl()
-                    } else {
-                        true
-                    }
-                }),
-            shift: self.shift()
-                && self.keys().iter().fold(true, |acc, key| {
-                    acc && if let Some(k) = key {
-                        !k.is_shift()
-                    } else {
-                        true
-                    }
-                }),
-            alt: self.alt()
-                && self.keys().iter().fold(true, |acc, key| {
-                    acc && if let Some(k) = key { !k.is_alt() } else { true }
-                }),
-            logo: self.logo()
-                && self.keys().iter().fold(true, |acc, key| {
-                    acc && if let Some(k) = key {
-                        !k.is_logo()
-                    } else {
-                        true
-                    }
-                }),
+            ctrl: *self.ctrl() && !ctrl,
+            shift: *self.shift() && !shift,
+            alt: *self.alt() && !alt,
+            logo: *self.logo() && !logo,
         }
     }
-    pub fn keys(self) -> [Option<Key>; 4] {
-        self.keys
+    pub fn keys(&self) -> &Vec<Key> {
+        &self.keys
     }
-    pub fn ctrl(self) -> bool {
-        self.ctrl
+    pub fn ctrl(&self) -> &bool {
+        &self.ctrl
     }
-    pub fn shift(self) -> bool {
-        self.shift
+    pub fn shift(&self) -> &bool {
+        &self.shift
     }
-    pub fn alt(self) -> bool {
-        self.alt
+    pub fn alt(&self) -> &bool {
+        &self.alt
     }
-    pub fn logo(self) -> bool {
-        self.logo
+    pub fn logo(&self) -> &bool {
+        &self.logo
     }
 
     pub fn mods(self) -> ModifiersState {
         let mut ret = ModifiersState::empty();
-        if self.shift() {
+        if *self.shift() {
             ret |= ModifiersState::SHIFT;
         }
-        if self.ctrl() {
+        if *self.ctrl() {
             ret |= ModifiersState::CTRL;
         }
-        if self.alt() {
+        if *self.alt() {
             ret |= ModifiersState::ALT;
         }
-        if self.logo() {
+        if *self.logo() {
             ret |= ModifiersState::LOGO;
         }
         ret

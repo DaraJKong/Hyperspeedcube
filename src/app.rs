@@ -2,7 +2,7 @@ use bitvec::bitvec;
 use cgmath::Point2;
 use itertools::Itertools;
 use key_names::KeyMappingCode;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fmt;
 #[cfg(not(target_arch = "wasm32"))]
 use std::path::Path;
@@ -44,9 +44,9 @@ pub struct App {
     pub(crate) cursor_pos: Option<Point2<f32>>,
 
     /// Set of pressed keys.
-    pressed_keys: HashSet<Key>,
+    pressed_keys: Vec<Key>,
     /// Set of keys toggled on using buttons in the UI.
-    toggled_keys: HashSet<Key>,
+    toggled_keys: Vec<Key>,
     /// Set of pressed modifier keys.
     pressed_modifiers: ModifiersState,
     /// Set of modifiers toggled on using buttons in the UI.
@@ -73,8 +73,8 @@ impl App {
 
             cursor_pos: None,
 
-            pressed_keys: HashSet::default(),
-            toggled_keys: HashSet::default(),
+            pressed_keys: Vec::new(),
+            toggled_keys: Vec::new(),
             pressed_modifiers: ModifiersState::default(),
             toggled_modifiers: ModifiersState::default(),
 
@@ -326,19 +326,25 @@ impl App {
 
                         // Only ever let a modifier key be in the pressed_keys set is it was the last key pressed
                         // This prevents modifier keys from counting as one key in the resolve_keys function
-                        self.pressed_keys = self
-                            .pressed_keys
-                            .clone()
-                            .into_iter()
-                            .filter(|k| !k.is_modifier())
-                            .collect();
+                        self.pressed_keys.retain(|&k| !k.is_modifier());
+
                         // Record the key as being pressed. If the key is
                         // already pressed, then ignore this event.
                         if let Some(sc) = sc {
-                            held |= !self.pressed_keys.insert(Key::Sc(sc));
+                            if !self.pressed_keys.contains(&Key::Sc(sc)) {
+                                self.pressed_keys.push(Key::Sc(sc));
+                                held |= false
+                            } else {
+                                held |= true
+                            }
                         }
                         if let Some(vk) = vk {
-                            held |= !self.pressed_keys.insert(Key::Vk(vk));
+                            if !self.pressed_keys.contains(&Key::Vk(vk)) {
+                                self.pressed_keys.push(Key::Vk(vk));
+                                held |= false
+                            } else {
+                                held |= true
+                            }
                         }
 
                         self.handle_key_press(sc, vk, held);
@@ -346,10 +352,10 @@ impl App {
 
                     ElementState::Released => {
                         if let Some(sc) = sc {
-                            self.pressed_keys.remove(&Key::Sc(sc));
+                            self.pressed_keys.retain(|&key| key != Key::Sc(sc));
                         }
                         if let Some(vk) = vk {
-                            self.pressed_keys.remove(&Key::Vk(vk));
+                            self.pressed_keys.retain(|&key| key != Key::Vk(vk));
                         }
 
                         self.handle_key_release(sc, vk);
@@ -400,7 +406,7 @@ impl App {
         let active_puzzle_keybinds =
             self.prefs.puzzle_keybinds[self.puzzle.ty()].get_active_keybinds();
         for bind in self.resolve_keypress(active_puzzle_keybinds, sc, vk, &self.pressed_keys) {
-            let key = bind.key.keys()[0].unwrap();
+            let key = bind.key.keys()[0];
             match &bind.command {
                 PuzzleCommand::Grip { axis, layers } => {
                     let mut new_grip = Grip::default();
@@ -609,7 +615,7 @@ impl App {
         keybinds: impl IntoIterator<Item = &'a Keybind<C>>,
         sc: Option<KeyMappingCode>,
         vk: Option<VirtualKeyCode>,
-        pressed_keys: &HashSet<Key>,
+        pressed_keys: &Vec<Key>,
     ) -> Vec<&'a Keybind<C>> {
         let sc = sc.map(Key::Sc);
         let vk = vk.map(Key::Vk);
@@ -624,31 +630,21 @@ impl App {
         keybinds
             .into_iter()
             .filter(move |bind| {
-                let key_combo = bind.key;
+                let key_combo = bind.key.clone();
                 let keys = key_combo.keys();
-                let keys_match = keys.iter().enumerate().fold(true, |acc, (i, key)| {
-                    acc && if let Some(k) = key {
-                        pressed_keys.contains(k) || Some(*k) == sc || Some(*k) == vk
-                    } else {
-                        if i == 0 {
-                            false
-                        } else {
-                            true
-                        }
-                    }
-                });
+                let keys_match = keys.len() > 0
+                    && keys
+                        .iter()
+                        .fold(true, |acc, key| acc && pressed_keys.contains(key));
                 // Prevent long keybinds (2+ keys) from being executed if extra keys are being pressed
-                // This is necessary to prevent conflicts between key combos of different lengths that share almost hte same keys
+                // This is necessary to prevent conflicts between key combos of different lengths that share almost the same keys
                 //
                 // For example, the keybinds `S + E + K` and `S + E + F + K` would conflict, and the shorter keybind
                 // would take priority and never let the longer one execute
-                let keys_length = keys
-                    .iter()
-                    .fold(0, |acc, key| if key.is_some() { acc + 1 } else { acc });
-                let extra_keys = pressed_keys_length > keys_length;
-                let mods_match =
-                    key_combo.mods() & modifiers_mask == self.pressed_modifiers() & modifiers_mask;
-                keys_match && mods_match && !(keys_length >= 2 && extra_keys)
+                let extra_keys = pressed_keys_length > keys.len();
+                let mods_match = key_combo.clone().mods() & modifiers_mask
+                    == self.pressed_modifiers() & modifiers_mask;
+                keys_match && mods_match && !(keys.len() > 1 && extra_keys)
             })
             .collect()
     }
@@ -737,7 +733,7 @@ impl App {
         Ok(())
     }
 
-    pub(crate) fn pressed_keys(&self) -> &HashSet<Key> {
+    pub(crate) fn pressed_keys(&self) -> &Vec<Key> {
         &self.pressed_keys
     }
     pub(crate) fn pressed_modifiers(&self) -> ModifiersState {
@@ -759,19 +755,19 @@ impl App {
 
         if is_pressed {
             if let Some(k) = maybe_vk {
-                self.toggled_keys.remove(&k);
+                self.toggled_keys.retain(|&key| key != k);
             }
             if let Some(k) = maybe_sc {
-                self.toggled_keys.remove(&k);
+                self.toggled_keys.retain(|&key| key != k);
             }
             self.toggled_modifiers.remove(mods);
             self.handle_key_release(sc, vk);
         } else {
             if let Some(k) = maybe_vk {
-                self.toggled_keys.insert(k);
+                self.toggled_keys.push(k);
             }
             if let Some(k) = maybe_sc {
-                self.toggled_keys.insert(k);
+                self.toggled_keys.push(k);
             }
             self.toggled_modifiers |= mods;
             self.handle_key_press(sc, vk, false);

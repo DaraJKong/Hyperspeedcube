@@ -184,7 +184,7 @@ where
                         if r.clicked() {
                             key_combo_popup::open(
                                 ui.ctx(),
-                                Some(keybind.key),
+                                Some(keybind.key.clone()),
                                 self.keybind_set.clone(),
                                 idx,
                             )

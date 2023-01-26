@@ -104,26 +104,18 @@ fn draw_key(ui: &mut egui::Ui, app: &mut App, key: KeyMappingCode, rect: egui::R
 
     let vk = key_names::key_to_winit_vkey(key);
 
-    let key_sc = Some(Key::Sc(key));
-    let key_vk = vk.map(Key::Vk);
+    let maybe_sc = Some(Key::Sc(key));
+    let maybe_vk = vk.map(Key::Vk);
 
-    // Adds the key to draw in to the pressed_keys
+    // Add the key to draw to the pressed_keys
     // This is to match long keybinds (2+ keys) that are one key away from being complete
     let mut pressed_keys = app.pressed_keys().clone();
-    pressed_keys = pressed_keys
-        .clone()
-        .into_iter()
-        .filter(|k| !k.is_modifier())
-        .collect();
-    pressed_keys.insert(key_sc.unwrap());
-    if let Some(k) = key_vk {
-        pressed_keys.insert(k);
+    pressed_keys.retain(|&k| !k.is_modifier());
+    pressed_keys.push(Key::Sc(key));
+    if let Some(k) = maybe_vk {
+        pressed_keys.push(k);
     }
 
-    // Add the key (of the keyboard overlay) to the pressed_keys to find keybinds that are one key away from being complete
-    //
-    // The goal is to only show long keybinds in the Keybinds Reference window if all keys except one are pressed
-    // Show the command description on this key if it's the missing one
     let matching_puzzle_keybinds: Vec<&Keybind<PuzzleCommand>> = app
         .resolve_keypress(
             app.prefs.puzzle_keybinds[puzzle_type].get_active_keybinds(),
@@ -134,8 +126,15 @@ fn draw_key(ui: &mut egui::Ui, app: &mut App, key: KeyMappingCode, rect: egui::R
         .into_iter()
         .filter(|bind| {
             bind.command != PuzzleCommand::None
-                && ((bind.key.keys().contains(&key_sc) && key_sc.is_some())
-                    || (bind.key.keys().contains(&key_vk) && key_vk.is_some()))
+                && (if let Some(maybe_sc) = maybe_sc {
+                    bind.key.keys().contains(&maybe_sc)
+                } else {
+                    false
+                } || if let Some(maybe_vk) = maybe_vk {
+                    bind.key.keys().contains(&maybe_vk)
+                } else {
+                    false
+                })
         })
         .collect();
     let matching_global_keybinds: Vec<&Keybind<Command>> = app
@@ -143,8 +142,15 @@ fn draw_key(ui: &mut egui::Ui, app: &mut App, key: KeyMappingCode, rect: egui::R
         .into_iter()
         .filter(|bind| {
             bind.command != Command::None
-                && ((bind.key.keys().contains(&key_sc) && key_sc.is_some())
-                    || (bind.key.keys().contains(&key_vk) && key_vk.is_some()))
+                && (if let Some(maybe_sc) = maybe_sc {
+                    bind.key.keys().contains(&maybe_sc)
+                } else {
+                    false
+                } || if let Some(maybe_vk) = maybe_vk {
+                    bind.key.keys().contains(&maybe_vk)
+                } else {
+                    false
+                })
         })
         .collect();
 
